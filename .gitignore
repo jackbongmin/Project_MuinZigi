@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+docs/JevApi.txt
 
 # 영상, 업로드 파일, 추출 프레임
 uploads/

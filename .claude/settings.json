@@ -9,7 +9,8 @@
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
-      "Read(!.env.example)"
+      "Read(!.env.example)",
+      "Read(./docs/JevApi.txt)"
     ]
   }
 }
