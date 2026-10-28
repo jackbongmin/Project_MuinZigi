@@ -1,16 +1,19 @@
-# Compiled class file
+# 비밀값 (.env.example만 커밋함)
+.env
+.env.*
+!.env.example
+
+# 영상, 업로드 파일, 추출 프레임
+uploads/
+frames/
+videos/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# 백엔드 빌드 결과물 (Java, Gradle)
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -18,7 +21,33 @@
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 웹·앱 (Node, Vite, Expo)
+node_modules/
+dist/
+.expo/
+web-build/
+
+# IDE 설정
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로그
+*.log
+logs/
+
+# Claude Code 개인 설정과 OMC 작업 상태
+.claude/settings.local.json
+.omc/
