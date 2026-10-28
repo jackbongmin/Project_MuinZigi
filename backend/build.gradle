@@ -29,5 +29,22 @@ dependencies {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		// 실제 Jev API를 부르는 테스트는 기본 테스트에서 뺌 (비용, 네트워크 필요)
+		excludeTags 'jev'
+	}
+}
+
+// 실제 Jev API를 호출하는 테스트만 실행: ./gradlew jevTest
+tasks.register('jevTest', Test) {
+	description = '실제 Jev API를 호출하는 테스트만 실행함'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'jev'
+	}
+	testLogging {
+		showStandardStreams = true
+	}
 }
