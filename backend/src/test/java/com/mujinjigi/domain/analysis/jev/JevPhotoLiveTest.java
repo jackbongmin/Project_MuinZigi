@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,15 +27,7 @@ class JevPhotoLiveTest {
             "GOGjGlLwdYQ", "-kPOROI-ZQI", "2dEoodA5x_k", "QzPNnCy_46g",
             "IH65r4HEQWQ", "bWMp9C3DFYE", "YQCUOmmu1_g", "Y3OTP6FwocA");
 
-    // 질문 세트 v0: 복잡한 질문 하나 대신 단순한 예/아니오 질문 여러 개로 나눔 (TypeSafe 권고)
-    private static final Map<String, String> QUESTIONS = new LinkedHashMap<>();
-
-    static {
-        QUESTIONS.put("person", "Is there a person or part of a person (such as a hand) in the image `photo`?");
-        QUESTIONS.put("holding_product", "Is a person holding a store product (not a shopping bag) in their hand in the image `photo`?");
-        QUESTIONS.put("putting_in_bag", "Is a person putting an item into a bag or pocket in the image `photo`?");
-        QUESTIONS.put("paying", "Is a person paying (by card, phone or cash) at a checkout or payment terminal in the image `photo`?");
-    }
+    private static final Map<String, String> QUESTIONS = QuestionSetV0.QUESTIONS;
 
     @Autowired
     JevClient jevClient;
