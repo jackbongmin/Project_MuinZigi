@@ -4,7 +4,8 @@
 !.env.example
 docs/JevApi.txt
 
-# 영상, 업로드 파일, 추출 프레임
+# 영상, 업로드 파일, 추출 프레임, 테스트 사진 (출처는 docs/test-data 문서에 남김)
+docs/test-data/photos/
 uploads/
 frames/
 videos/
