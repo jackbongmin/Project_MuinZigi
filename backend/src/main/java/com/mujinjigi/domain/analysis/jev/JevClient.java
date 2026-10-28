@@ -16,9 +16,6 @@ import org.springframework.web.client.RestClient;
 @Component
 public class JevClient {
 
-    // 요청 안에서 이미지를 가리키는 이름. state와 assets가 같은 이름으로 연결됨
-    private static final String IMAGE_REF = "photo-1";
-
     private final RestClient restClient;
     private final String model;
     private final boolean hasApiKey;
@@ -42,15 +39,34 @@ public class JevClient {
      * @param questions 질문 이름 → 질문 문장
      */
     public JevResponse askYesNo(byte[] image, String format, Map<String, String> questions) {
+        // 질문에서는 이 이미지를 `photo`라는 이름으로 가리킴
+        return askYesNo(Map.of("photo", image), format, questions);
+    }
+
+    /**
+     * 이미지 여러 장에 예/아니오 질문들을 보냄 (예: 진열대 전후 비교)
+     *
+     * @param images    질문에서 부를 이름 → 이미지 바이트 (예: "before", "after")
+     * @param format    모든 이미지의 형식 ("png", "jpg", "jpeg")
+     * @param questions 질문 이름 → 질문 문장. 문장 안에서 `before`처럼 이미지 이름으로 가리킴
+     */
+    public JevResponse askYesNo(Map<String, byte[]> images, String format, Map<String, String> questions) {
         // 키가 없으면 Jev가 403만 돌려줘서 원인을 알기 어려움. 요청 전에 막고 이유를 알려줌
         if (!hasApiKey) {
             throw new IllegalStateException("JEV_API_KEY가 비어 있음. .env에 값을 넣어야 함");
         }
 
-        Map<String, Object> asset = Map.of(
-                "type", "image",
-                "format", format,
-                "data_base64", Base64.getEncoder().encodeToString(image));
+        // state에는 이름 → 참조 문자열, assets에는 참조 문자열 → 이미지. 같은 참조 문자열로 연결됨
+        Map<String, Object> state = new LinkedHashMap<>();
+        Map<String, Object> assets = new LinkedHashMap<>();
+        images.forEach((name, image) -> {
+            String ref = "image-" + name;
+            state.put(name, ref);
+            assets.put(ref, Map.of(
+                    "type", "image",
+                    "format", format,
+                    "data_base64", Base64.getEncoder().encodeToString(image)));
+        });
 
         Map<String, Object> noulQuestions = new LinkedHashMap<>();
         questions.forEach((name, instructions) ->
@@ -59,8 +75,8 @@ public class JevClient {
         Map<String, Object> body = Map.of(
                 "model", model,
                 // 여러 질문이 같은 이미지를 보므로 state에 한 번만 넣음 (공식 권장)
-                "state", Map.of("photo", IMAGE_REF),
-                "assets", Map.of(IMAGE_REF, asset),
+                "state", state,
+                "assets", assets,
                 "questions", noulQuestions);
 
         return restClient.post()
