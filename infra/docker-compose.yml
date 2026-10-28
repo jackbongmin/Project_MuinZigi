@@ -1,0 +1,23 @@
+# 개발용 PostgreSQL
+# 실행 (저장소 루트에서): docker compose --env-file .env -f infra/docker-compose.yml up -d
+# 이름을 정하지 않으면 폴더 이름(infra)이 컨테이너·볼륨 이름 앞에 붙음
+name: mujinjigi
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: mujinjigi-postgres
+    # ${이름:?안내문}: .env에 값이 없거나 비어 있으면 안내문을 띄우고 실행을 멈춤
+    environment:
+      POSTGRES_DB: ${DB_NAME:?.env에 DB_NAME을 채워주세요}
+      POSTGRES_USER: ${DB_USERNAME:?.env에 DB_USERNAME을 채워주세요}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?.env에 DB_PASSWORD를 채워주세요}
+    # PC에 설치된 PostgreSQL이 5432를 쓰고 있어서, PC 쪽 포트는 5433(DB_PORT)으로 연결함
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      # 컨테이너를 지워도 데이터가 남도록 볼륨에 저장함 (PostgreSQL 18부터 경로가 /var/lib/postgresql)
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:
