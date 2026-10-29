@@ -30,6 +30,7 @@ class JevFrameLiveTest {
     static {
         QUESTION_SETS.put("v0", QuestionSetV0.QUESTIONS);
         QUESTION_SETS.put("v1", QuestionSetV1.QUESTIONS);
+        QUESTION_SETS.put("v2", QuestionSetV2.QUESTIONS);
     }
 
     @Autowired
