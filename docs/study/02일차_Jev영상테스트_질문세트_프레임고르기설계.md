@@ -22,7 +22,19 @@
   - 기록: `docs/portfolio/decisions/003_장면_변화_필터_대신_활동_구간_전체를_보냄.md`
   - 가이드: `docs/guide/02_프레임_추출과_고르기.md` (Claude Code가 먼저 작성해 테스트 13개 통과를 확인하고, 기능 코드는 지워 둠)
 
+- 브랜치 나눔: `main` → `develop` → `feature/frame-extraction` (규칙은 CLAUDE.md "브랜치 규칙")
+- 가이드 02 코드 작성 (테스트 코드는 이번만 Claude Code가 넣음)
+  - 테스트 13개 통과, 실제 서버에서 P1 업로드 → 16장(0~3초, 8~19초), 같은 영상 다시 추출하면 409 확인
+
+## 리뷰에서 지적된 점
+- `FrameExtractor`에 `@Component`를 빠뜨림 → Spring이 빈을 못 찾아(`No qualifying bean of type 'FrameExtractor'`) 서버가 안 뜨고, 상관없는 기존 테스트까지 8개가 실패함
+  - `new`로 직접 만드는 `FrameExtractorTest`는 통과함. 단위 테스트만으로는 못 잡고 통합 테스트(Spring을 띄우는 테스트)가 잡는 실수임
+  - import만 있고 쓰이지 않으면 IntelliJ가 회색으로 표시함. 회색 import는 빠뜨린 것이 없는지 의심해 볼 것
+- `FrameSelector` 주석 오타: "움직밍" → "움직임", "노려서" → "놓쳐서" (뜻이 반대가 됨)
+
 ## 바뀐 파일
+- `backend/src/main/java/com/mujinjigi/domain/video/`: `ExtractedFrame`, `FrameExtractor`, `FrameSelector`, `FrameService`, `VideoFrame`, `VideoFrameRepository`, `VideoFrameResponse`, `VideoFrameController` 추가, `VideoFileStorage.pathOf()` 추가
+- `backend/src/test/java/com/mujinjigi/domain/video/`: `TestVideos`, `FrameSelectorTest`, `FrameExtractorTest`, `VideoFrameControllerTest`
 - `backend/src/test/java/com/mujinjigi/domain/analysis/jev/QuestionSetV1~V3.java`: 질문 세트 실험
 - `backend/src/test/java/com/mujinjigi/domain/analysis/jev/JevFrameLiveTest.java`: 여러 질문 세트를 같은 프레임에 연달아 보냄
 - `backend/src/test/java/com/mujinjigi/domain/analysis/jev/JevShelfLiveTest.java`: 장면별 화면 전체 / 칸 자르기 비교 추가
