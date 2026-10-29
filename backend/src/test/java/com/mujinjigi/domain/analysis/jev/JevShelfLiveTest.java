@@ -37,6 +37,12 @@ class JevShelfLiveTest {
         CASES.put("same_frame", new String[]{"P1_before.jpg", "P1_before.jpg"});
         CASES.put("p1_0s_vs_19s", new String[]{"P1_before.jpg", "P1_after.jpg"});
         CASES.put("p1_0s_vs_19s_edited", new String[]{"P1_before.jpg", "P1_after_edited.jpg"});
+
+        // 영상의 첫 프레임 vs 마지막 프레임. full은 화면 전체, roi는 상품이 놓인 진열대 칸만 잘라낸 사진
+        for (String scene : new String[]{"P2", "P3", "N1", "N2", "N3", "N4", "N5"}) {
+            CASES.put(scene + "_full", new String[]{scene + "_before.jpg", scene + "_after.jpg"});
+            CASES.put(scene + "_roi", new String[]{scene + "_before_roi.jpg", scene + "_after_roi.jpg"});
+        }
     }
 
     @Autowired
