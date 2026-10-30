@@ -35,4 +35,9 @@ public class VideoFileStorage {
         }
         return storedName;
     }
+
+    // 저장 이름으로 디스크의 실제 경로를 돌려줌 (프레임 추출할 때 씀)
+    public Path pathOf(String storedName) {
+        return videoDir.resolve(storedName);
+    }
 }
