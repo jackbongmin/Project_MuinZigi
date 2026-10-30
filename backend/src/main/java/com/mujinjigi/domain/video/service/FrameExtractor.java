@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * FFmpeg로 영상에서 1초에 1장씩 프레임을 뽑고, 프레임마다 장면 변화 점수를 함께 구함
  */
 @Component

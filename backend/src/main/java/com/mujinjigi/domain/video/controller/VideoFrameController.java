@@ -14,6 +14,7 @@ import com.mujinjigi.domain.video.dto.VideoFrameResponse;
 import com.mujinjigi.domain.video.service.FrameService;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * 영상 프레임 추출·조회 API
  */
 @RestController

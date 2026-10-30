@@ -1,5 +1,7 @@
 # 가이드 01 · 영상 업로드 API
 
+> **한 줄 요약**: 점주가 올린 **영상 파일**을 **디스크**에 저장하고 그 정보를 **DB(`videos`)**에 기록해, 이후 단계가 영상 id 하나로 녹화본을 찾을 수 있게 하는 기능 구현임
+
 ## 목표
 - 점주가 녹화본을 올리면 서버가 파일을 디스크에 저장하고, 영상 정보를 DB에 기록함
 - 올린 영상의 정보를 id로 조회할 수 있음
@@ -131,6 +133,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 업로드한 녹화본 한 개. 파일 자체는 디스크에 두고, DB에는 파일을 찾을 정보만 저장함
  */
 @Entity
@@ -200,6 +203,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.mujinjigi.domain.video.entity.Video;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * Video 저장·조회. save, findById 같은 기본 메서드는 JpaRepository가 만들어 줌
  */
 public interface VideoRepository extends JpaRepository<Video, Long> {
@@ -218,6 +222,7 @@ import java.time.LocalDateTime;
 import com.mujinjigi.domain.video.entity.Video;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 영상 정보를 API로 돌려줄 때 쓰는 응답 형식. 엔티티를 그대로 내보내지 않고 필요한 값만 담음
  */
 public record VideoResponse(Long id, String originalName, long sizeBytes, LocalDateTime uploadedAt) {
@@ -249,6 +254,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 업로드한 영상 파일을 디스크에 저장함. 배포 때 S3로 바꾸면 이 클래스만 바뀌면 됨
  */
 @Component
@@ -298,6 +304,7 @@ import com.mujinjigi.domain.video.entity.Video;
 import com.mujinjigi.domain.video.repository.VideoRepository;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 영상 업로드와 조회
  */
 @Service
@@ -370,6 +377,7 @@ import com.mujinjigi.domain.video.dto.VideoResponse;
 import com.mujinjigi.domain.video.service.VideoService;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 영상 업로드·조회 API
  */
 @RestController
@@ -423,6 +431,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 영상 업로드 API 테스트. 서버를 실제로 띄우지 않고 MockMvc로 요청을 흉내 냄
  * DB는 Docker PostgreSQL을 쓰고, 테스트가 끝나면 @Transactional로 저장한 내용을 되돌림
  */

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
+ * 0단계 · Jev 이미지 요청 보내 보기
  * 실제 Jev API를 호출하는 테스트. 비용과 네트워크가 필요해서 ./gradlew jevTest로만 실행함
  * JevClient만 띄워서 DB 없이도 실행됨
  */

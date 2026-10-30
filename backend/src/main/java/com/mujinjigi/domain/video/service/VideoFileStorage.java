@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
+ * 1단계 · 02 (pathOf 추가)
  * 업로드한 영상 파일을 디스크에 저장함. 배포 때 S3로 바꾸면 이 클래스만 바꾸면됨 ㅇㅇ
  */
 @Component

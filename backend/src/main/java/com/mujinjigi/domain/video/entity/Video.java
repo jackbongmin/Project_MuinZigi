@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 업로드한 녹화본 한 개. 파일 자체는 디스크에 두고, DB에는 파일을 찾을 정보만 저장함
  */
 

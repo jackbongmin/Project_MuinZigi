@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * 0단계 · 미결제 상황 판단 2차 테스트 (영상 프레임)
  * 질문 세트 v1. v0의 오탐(손님 자기 폰·지갑을 가방에 넣거나 꺼내는 동작을 "넣음"으로 판단)을 줄이려고
  * holding_product와 putting_in_bag에 "진열대에서 가져온 매장 상품"이라는 조건과 제외 대상을 넣음
  * person, paying은 v0과 같게 두어서 바뀐 질문의 효과만 비교함

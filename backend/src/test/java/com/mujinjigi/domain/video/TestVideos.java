@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * 테스트용 짧은 영상을 FFmpeg로 만듦. 검은 화면 3초 → 흰 화면 3초 (3초에서 장면이 크게 바뀜)
  * 실제 영상 파일을 저장소에 넣지 않으려고 테스트할 때마다 만듦
  */

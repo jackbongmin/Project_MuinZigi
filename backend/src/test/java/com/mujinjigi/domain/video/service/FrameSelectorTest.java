@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * 프레임 고르기 규칙 테스트. Spring 없이 객체를 직접 만들어 빠르게 확인함
  */
 class FrameSelectorTest {
