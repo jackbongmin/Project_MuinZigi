@@ -15,10 +15,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.mujinjigi.domain.analysis.dto.FrameJudgmentResponse;
 import com.mujinjigi.domain.analysis.entity.FrameJudgment;
+import com.mujinjigi.domain.analysis.entity.JevCallLog;
 import com.mujinjigi.domain.analysis.jev.FrameQuestions;
+import com.mujinjigi.domain.analysis.jev.JevCallAttempt;
+import com.mujinjigi.domain.analysis.jev.JevCallException;
 import com.mujinjigi.domain.analysis.jev.JevClient;
 import com.mujinjigi.domain.analysis.jev.JevResponse;
+import com.mujinjigi.domain.analysis.jev.JevResult;
 import com.mujinjigi.domain.analysis.repository.FrameJudgmentRepository;
+import com.mujinjigi.domain.analysis.repository.JevCallLogRepository;
 import com.mujinjigi.domain.video.entity.VideoFrame;
 import com.mujinjigi.domain.video.repository.VideoFrameRepository;
 import com.mujinjigi.domain.video.repository.VideoRepository;
@@ -27,6 +32,7 @@ import com.mujinjigi.domain.video.service.FrameService;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
+ * 1단계 · 04 (Jev 호출 기록 저장, 실패 시 502)
  * 저장된 프레임을 Jev에 보내 판단 결과를 저장함
  */
 @Service
@@ -35,17 +41,20 @@ public class JudgmentService {
     private final VideoRepository videoRepository;
     private final VideoFrameRepository videoFrameRepository;
     private final FrameJudgmentRepository frameJudgmentRepository;
+    private final JevCallLogRepository jevCallLogRepository;
     private final FrameService frameService;
     private final JevClient jevClient;
 
     public JudgmentService(VideoRepository videoRepository,
                            VideoFrameRepository videoFrameRepository,
                            FrameJudgmentRepository frameJudgmentRepository,
+                           JevCallLogRepository jevCallLogRepository,
                            FrameService frameService,
                            JevClient jevClient) {
         this.videoRepository = videoRepository;
         this.videoFrameRepository = videoFrameRepository;
         this.frameJudgmentRepository = frameJudgmentRepository;
+        this.jevCallLogRepository = jevCallLogRepository;
         this.frameService = frameService;
         this.jevClient = jevClient;
     }
@@ -82,7 +91,18 @@ public class JudgmentService {
 
     private FrameJudgment judgeOne(Long videoId, VideoFrame frame) {
         byte[] image = readImage(videoId, frame);
-        JevResponse response = jevClient.askYesNo(image, "jpg", FrameQuestions.QUESTIONS);
+        JevResult result;
+        try {
+            result = jevClient.askYesNo(image, "jpg", FrameQuestions.QUESTIONS);
+        } catch (JevCallException e) {
+            // 재시도까지 실패함. 실패한 시도도 기록으로 남기고, 외부 서버 문제라는 뜻으로 502를 돌려줌
+            // 이미 판단한 프레임은 저장돼 있어서, 다시 부르면 남은 프레임부터 이어서 판단함
+            saveCallLogs(frame, e.getRequestBody(), e.getAttempts());
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                    e.getMessage() + " (프레임 " + frame.getTimeSec() + "초)", e);
+        }
+        saveCallLogs(frame, result.requestBody(), result.attempts());
+        JevResponse response = result.response();
 
         // 응답 형식(Answer 객체)을 그대로 저장하지 않고, 질문 이름 → 확률만 꺼내서 저장함
         Map<String, Double> answers = new LinkedHashMap<>();
@@ -92,6 +112,13 @@ public class JudgmentService {
                 response.usage().inputTokens(), answers);
     }
 
+
+    // 시도마다 한 줄씩 저장함 (재시도했으면 여러 줄)
+    private void saveCallLogs(VideoFrame frame, String requestBody, List<JevCallAttempt> attempts) {
+        jevCallLogRepository.saveAll(attempts.stream()
+                .map(attempt -> new JevCallLog(frame, requestBody, attempt))
+                .toList());
+    }
 
     private byte[] readImage(Long videoId, VideoFrame frame) {
         try {

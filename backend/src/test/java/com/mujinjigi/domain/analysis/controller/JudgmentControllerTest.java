@@ -1,5 +1,6 @@
 package com.mujinjigi.domain.analysis.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -13,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jayway.jsonpath.JsonPath;
 import com.mujinjigi.domain.analysis.jev.FrameQuestions;
+import com.mujinjigi.domain.analysis.jev.JevCallAttempt;
+import com.mujinjigi.domain.analysis.jev.JevCallException;
 import com.mujinjigi.domain.analysis.jev.JevClient;
 import com.mujinjigi.domain.analysis.jev.JevResponse;
+import com.mujinjigi.domain.analysis.jev.JevResult;
+import com.mujinjigi.domain.analysis.repository.JevCallLogRepository;
 import com.mujinjigi.domain.video.TestVideos;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
+ * 1단계 · 04 (호출 기록, Jev 실패 시 502)
  * 프레임 판단 API 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
  */
 @SpringBootTest(properties = {
@@ -45,6 +53,10 @@ class JudgmentControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    // 시도 기록이 저장됐는지 셀 때 씀
+    @Autowired
+    JevCallLogRepository jevCallLogRepository;
 
     // 스프링이 진짜 JevClient 대신 이 가짜를 주입함
     @MockitoBean
@@ -61,8 +73,11 @@ class JudgmentControllerTest {
                 Map.of("person", new JevResponse.Answer("noul", 0.9),
                         "putting_in_bag", new JevResponse.Answer("noul", 0.1)),
                 new JevResponse.Usage(2803, 0));
+        // 한 번에 성공한 것처럼 시도 기록 1개를 같이 돌려줌
+        JevResult fakeResult = new JevResult(fakeResponse, "{\"model\": \"jev-1.14.0\"}",
+                List.of(new JevCallAttempt(1, LocalDateTime.now(), 200, "{\"model\": \"jev-1.14.0\"}", null, 300)));
         when(jevClient.askYesNo(any(byte[].class), eq("jpg"), eq(FrameQuestions.QUESTIONS)))
-                .thenReturn(fakeResponse);
+                .thenReturn(fakeResult);
     }
 
     @Test
@@ -83,6 +98,8 @@ class JudgmentControllerTest {
         mockMvc.perform(get("/api/videos/{id}/judgments", videoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(5));
+        // 프레임마다 시도 기록이 1줄씩 남음
+        assertThat(jevCallLogRepository.countByFrameVideoId(videoId)).isEqualTo(5);
     }
 
     @Test
@@ -95,6 +112,21 @@ class JudgmentControllerTest {
                 .andExpect(jsonPath("$.length()").value(5));
         // 두 번 불렀지만 Jev 호출은 처음의 5번뿐임
         verify(jevClient, times(5)).askYesNo(any(byte[].class), eq("jpg"), eq(FrameQuestions.QUESTIONS));
+    }
+
+    @Test
+    void Jev가_재시도까지_실패하면_502를_돌려주고_시도_기록을_남긴다() throws Exception {
+        List<JevCallAttempt> failed = List.of(
+                new JevCallAttempt(1, LocalDateTime.now(), 529, "overloaded", null, 100),
+                new JevCallAttempt(2, LocalDateTime.now(), 529, "overloaded", null, 100),
+                new JevCallAttempt(3, LocalDateTime.now(), 529, "overloaded", null, 100));
+        when(jevClient.askYesNo(any(byte[].class), eq("jpg"), eq(FrameQuestions.QUESTIONS)))
+                .thenThrow(new JevCallException("Jev 호출 실패: 상태 코드 529, 3번 시도", "{}", failed, null));
+        long videoId = uploadAndExtract();
+
+        mockMvc.perform(post("/api/videos/{id}/judgments", videoId))
+                .andExpect(status().isBadGateway());
+        assertThat(jevCallLogRepository.countByFrameVideoId(videoId)).isEqualTo(3);
     }
 
     @Test

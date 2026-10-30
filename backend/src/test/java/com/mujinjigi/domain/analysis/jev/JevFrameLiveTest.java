@@ -21,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 프레임은 docs/test-data/frames/<장면 코드>/에 있음 (FFmpeg로 1초에 1장, 커밋하지 않음)
  */
 @Tag("jev")
-@SpringBootTest(classes = JevClient.class)
+@SpringBootTest(classes = {JevConfig.class, JevClient.class})
 class JevFrameLiveTest {
 
     private static final Path FRAME_ROOT = Path.of("../docs/test-data/frames");
@@ -63,7 +63,7 @@ class JevFrameLiveTest {
 
             for (Path frame : frames) {
                 long start = System.nanoTime();
-                JevResponse response = jevClient.askYesNo(Files.readAllBytes(frame), "jpg", questions);
+                JevResponse response = jevClient.askYesNo(Files.readAllBytes(frame), "jpg", questions).response();
                 long elapsedMs = (System.nanoTime() - start) / 1_000_000;
 
                 StringBuilder line = new StringBuilder(frame.getFileName().toString());
