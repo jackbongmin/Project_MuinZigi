@@ -22,6 +22,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.mujinjigi.domain.video.TestVideos;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * 프레임 추출 API 테스트. 실제로 영상을 올리고 FFmpeg로 프레임을 뽑음 (PATH에 ffmpeg가 있어야 함)
  */
 @SpringBootTest(properties = {

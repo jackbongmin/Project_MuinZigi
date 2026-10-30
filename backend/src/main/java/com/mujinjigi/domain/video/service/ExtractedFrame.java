@@ -1,6 +1,7 @@
 package com.mujinjigi.domain.video.service;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * FFmpeg가 뽑은 프레임 한 장의 정보
  *
  * @param fileName   프레임 파일 이름 (frame_0001.jpg)

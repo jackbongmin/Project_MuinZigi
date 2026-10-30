@@ -15,6 +15,7 @@ import com.mujinjigi.domain.video.repository.VideoRepository;
 
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 영상 업로드와 조회
  */
 @Service

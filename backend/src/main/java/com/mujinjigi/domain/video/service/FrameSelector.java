@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * Jev에 보낼 프레임을 고름. 움직밍이 있는 프레임의 앞뒤 몇 초까지 남기고, 오래 조용한 구간은 뺌
  * 변화가 큰 프레임만 고르면 제자리에서 손만 움직이는 동작을 노려서 이렇게 정함
  */

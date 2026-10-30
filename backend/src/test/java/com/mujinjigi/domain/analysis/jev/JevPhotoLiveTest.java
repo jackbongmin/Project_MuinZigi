@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
+ * 0단계 · 미결제 상황 판단 1차 테스트 (사진)
  * 0단계: 매장 상황 사진에 질문 세트를 보내고 확률을 출력함. ./gradlew jevTest로만 실행함
  * 사진은 docs/test-data/photos/에 있음 (커밋하지 않음, 출처는 docs/test-data/2026-10-28_jev_사진_테스트.md)
  */

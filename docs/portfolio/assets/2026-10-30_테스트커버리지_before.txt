@@ -1,0 +1,27 @@
+# 테스트 커버리지 기준선 (2026-10-30, feature/jev-analysis, 가이드 03 빈 파일 상태)
+# 명령: gradlew test (JaCoCo 0.8.13, jevTest 제외)
+
+com.mujinjigi.domain.video.controller.VideoController line   5/6   branch  0/0 
+com.mujinjigi.domain.video.controller.VideoFrameController line   6/6   branch  0/0 
+com.mujinjigi.domain.video.dto.VideoResponse  line   6/6   branch  0/0 
+com.mujinjigi.domain.video.dto.VideoFrameResponse line   2/2   branch  0/0 
+com.mujinjigi.MujinjigiApplication            line   1/3   branch  0/0 
+com.mujinjigi.domain.analysis.service.JudgmentService line   0/1   branch  0/0 
+com.mujinjigi.domain.analysis.dto.FrameJudgmentResponse line   0/1   branch  0/0 
+com.mujinjigi.domain.analysis.controller.JudgmentController line   0/1   branch  0/0 
+com.mujinjigi.domain.analysis.jev.JevResponse.Usage line   0/1   branch  0/0 
+com.mujinjigi.domain.analysis.jev.FrameQuestions line   0/1   branch  0/0 
+com.mujinjigi.domain.analysis.jev.JevClient   line   8/30  branch  1/4 
+com.mujinjigi.domain.analysis.jev.JevResponse.Answer line   0/1   branch  0/0 
+com.mujinjigi.domain.analysis.jev.JevResponse line   0/1   branch  0/0 
+com.mujinjigi.domain.video.service.FrameExtractor line  27/33  branch  6/8 
+com.mujinjigi.domain.video.service.FrameSelector line  15/15  branch  8/8 
+com.mujinjigi.domain.video.service.ExtractedFrame line   1/1   branch  0/0 
+com.mujinjigi.domain.video.service.VideoService line  17/19  branch  6/8 
+com.mujinjigi.domain.video.service.VideoFileStorage line   9/11  branch  0/0 
+com.mujinjigi.domain.video.service.FrameService line  33/35  branch  6/6 
+com.mujinjigi.domain.video.entity.Video       line  13/13  branch  0/0 
+com.mujinjigi.domain.video.entity.VideoFrame  line  11/13  branch  0/0 
+com.mujinjigi.domain.analysis.entity.FrameJudgment line   0/1   branch  0/0 
+
+TOTAL line 154/201 (76.6%) branch 27/34 (79.4%)

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * 0단계 · Jev 이미지 요청 보내 보기
  * Jev 응답. 지금 쓰는 필드만 받고 나머지는 무시함
  *
  * @param model   실제로 답한 모델 이름 (로그에 남길 값)

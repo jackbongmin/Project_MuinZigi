@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.2'
 	id 'io.spring.dependency-management' version '1.1.7'
+	// 테스트 커버리지 측정 (테스트가 실행한 줄·분기 비율)
+	id 'jacoco'
 }
 
 group = 'com.mujinjigi'
@@ -32,6 +34,21 @@ tasks.named('test') {
 	useJUnitPlatform {
 		// 실제 Jev API를 부르는 테스트는 기본 테스트에서 뺌 (비용, 네트워크 필요)
 		excludeTags 'jev'
+	}
+	// 테스트가 끝나면 커버리지 보고서를 바로 만듦
+	finalizedBy tasks.named('jacocoTestReport')
+}
+
+jacoco {
+	toolVersion = '0.8.13'
+}
+
+// 커버리지 보고서: build/reports/jacoco/test/html/index.html (브라우저로 엶)
+// 기본 테스트(test)만 측정함. 실제 Jev를 부르는 jevTest는 비용이 들어서 넣지 않음
+tasks.named('jacocoTestReport') {
+	reports {
+		html.required = true
+		csv.required = true
 	}
 }
 

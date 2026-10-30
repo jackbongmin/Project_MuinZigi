@@ -12,6 +12,7 @@ import org.junit.jupiter.api.io.TempDir;
 import com.mujinjigi.domain.video.TestVideos;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * FFmpeg를 실제로 실행해 프레임과 장면 변화 점수를 뽑는지 확인함 (PATH에 ffmpeg가 있어야 함)
  */
 class FrameExtractorTest {
