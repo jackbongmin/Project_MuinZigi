@@ -21,6 +21,7 @@ import com.mujinjigi.domain.video.repository.VideoFrameRepository;
 import com.mujinjigi.domain.video.repository.VideoRepository;
 
 /**
+ * 1단계 · 02 (프레임 추출과 고르기)
  * 영상에서 프레임을 뽑고, Jev에 보낼 프레임만 골라 저장함
  */
 @Service
@@ -73,6 +74,11 @@ public class FrameService {
         return videoFrameRepository.findByVideoIdOrderByTimeSecAsc(videoId).stream()
                 .map(VideoFrameResponse::from)
                 .toList();
+    }
+
+    // 프레임 이미지 파일의 실제 경로(Jev에 보낼 때 씀) 프레임 폴더 위치는 이 클래스만 알고있음.
+    public Path imagePath(Long videoId, String fileName) {
+        return frameDir.resolve(String.valueOf(videoId)).resolve(fileName);
     }
 
     private Video findVideo(Long videoId) {

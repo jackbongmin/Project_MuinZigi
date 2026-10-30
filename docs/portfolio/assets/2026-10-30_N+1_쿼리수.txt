@@ -1,0 +1,10 @@
+# 판단 목록 조회 쿼리 수 측정 (2026-10-30)
+# 조건: 테스트 영상(검은 화면 3초 → 흰 화면 3초) 업로드 → 프레임 5장 추출 → 판단 5개 저장
+#       영속성 컨텍스트를 비운 뒤(em.clear) 조회하고 응답 DTO로 바꿈. Hibernate Statistics의 PrepareStatementCount로 셈
+
+before (join만, fetch 없음): 결과 5개, 쿼리 6번
+  select ... from frame_judgments fj1_0 join video_frames f1_0 on ... where f1_0.video_id=? ... order by f1_0.time_sec
+  select ... from video_frames vf1_0 where vf1_0.id=?   (× 5, 결과마다 프레임을 따로 읽음)
+
+after (join fetch): 결과 5개, 쿼리 1번
+  select fj1_0.id, ..., f1_0.id, f1_0.file_name, f1_0.scene_score, f1_0.time_sec, ... from frame_judgments fj1_0 join video_frames f1_0 on ... order by f1_0.time_sec
