@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 사진은 docs/test-data/shelf/에 있음 (커밋하지 않음). ./gradlew jevTest로만 실행함
  */
 @Tag("jev")
-@SpringBootTest(classes = JevClient.class)
+@SpringBootTest(classes = {JevConfig.class, JevClient.class})
 class JevShelfLiveTest {
 
     private static final Path SHELF_DIR = Path.of("../docs/test-data/shelf");
@@ -59,7 +59,7 @@ class JevShelfLiveTest {
             images.put("after", Files.readAllBytes(SHELF_DIR.resolve(entry.getValue()[1])));
 
             long start = System.nanoTime();
-            JevResponse response = jevClient.askYesNo(images, "jpg", QUESTIONS);
+            JevResponse response = jevClient.askYesNo(images, "jpg", QUESTIONS).response();
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;
 
             StringBuilder line = new StringBuilder(entry.getKey());

@@ -1,0 +1,32 @@
+# Jev 재시도·호출 기록 실제 서버 확인 (2026-10-30, P1.mp4, 프레임 16장)
+
+## 1. 정상 (기본 설정: read-timeout 30초)
+judge 201 4.83s
+ logs | frames | attempt min/max | status min/max | avg_ms | req_len | res_len
+   16 |     16 |  1 / 1          | 200 / 200      |    263 |     802 |     248
+- 요청 원문 802자: 이미지 base64(204,219 bytes)는 "(생략: 204219 bytes)"로 바꿔 저장
+- 응답 원문 예: {"model":"jev-1.14.0","answers":{"person":{"type":"noul","noul":0.07}, ...},"usage":{"input_tokens":2803,"output_tokens":74}}
+
+## 2. 고치기 전 (read-timeout 1ms, retrieve().onStatus().toEntity())
+judge 500 1.95s
+ERROR ... Request processing failed: org.springframework.web.client.RestClientException:
+      Error while extracting response for type [java.lang.String] and content type [application/octet-stream]
+      with root cause java.net.SocketTimeoutException: Read timed out
+jev_call_logs: 0 rows, frame_judgments: 0 rows
+
+## 3. 고친 후 (read-timeout 1ms, exchange())
+judge 502 2.0s
+ time_sec | attempt | status_code | elapsed_ms |  called_at   | error
+        0 |       1 |             |        325 | 15:22:44.520 | /v1/systemone": Read timed out
+        0 |       2 |             |         19 | 15:22:45.319 | /v1/systemone": Read timed out
+        0 |       3 |             |         20 | 15:22:46.225 | /v1/systemone": Read timed out
+- 1번째 시도 끝(44.845) → 2번째 시작(45.319): 약 0.47초 대기 (0.5초에서 지터만큼 줄어듦)
+- 2번째 시도 끝(45.338) → 3번째 시작(46.225): 약 0.89초 대기 (1초에서 지터만큼 줄어듦)
+
+## 4. 같은 영상을 기본 설정으로 다시 판단
+judge 201 5.56s
+judgments: 16
+ status_code | count
+             |     3   (2번의 실패 시도)
+         200 |    16
+- 0초 프레임: 1·2·3번째 시도 실패(15:22) → 다시 부른 뒤 1번째 시도에 200(15:23)
