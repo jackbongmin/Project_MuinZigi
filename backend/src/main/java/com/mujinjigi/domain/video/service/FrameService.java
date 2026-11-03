@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.mujinjigi.domain.analysis.entity.MeasurementLog;
+import com.mujinjigi.domain.analysis.entity.MeasurementStep;
+import com.mujinjigi.domain.analysis.repository.MeasurementLogRepository;
 import com.mujinjigi.domain.video.dto.VideoFrameResponse;
 import com.mujinjigi.domain.video.entity.Video;
 import com.mujinjigi.domain.video.entity.VideoFrame;
@@ -22,6 +25,7 @@ import com.mujinjigi.domain.video.repository.VideoRepository;
 
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
+ * 1단계 · 05 (추출 측정 로그 저장)
  * 영상에서 프레임을 뽑고, Jev에 보낼 프레임만 골라 저장함
  */
 @Service
@@ -29,6 +33,7 @@ public class FrameService {
 
     private final VideoRepository videoRepository;
     private final VideoFrameRepository videoFrameRepository;
+    private final MeasurementLogRepository measurementLogRepository;
     private final VideoFileStorage videoFileStorage;
     private final FrameExtractor frameExtractor;
     private final FrameSelector frameSelector;
@@ -36,12 +41,14 @@ public class FrameService {
 
     public FrameService(VideoRepository videoRepository,
                         VideoFrameRepository videoFrameRepository,
+                        MeasurementLogRepository measurementLogRepository,
                         VideoFileStorage videoFileStorage,
                         FrameExtractor frameExtractor,
                         FrameSelector frameSelector,
                         @Value("${app.storage.frame-dir}") String frameDir) {
         this.videoRepository = videoRepository;
         this.videoFrameRepository = videoFrameRepository;
+        this.measurementLogRepository = measurementLogRepository;
         this.videoFileStorage = videoFileStorage;
         this.frameExtractor = frameExtractor;
         this.frameSelector = frameSelector;
@@ -55,17 +62,26 @@ public class FrameService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 프레임을 추출한 영상임: " + videoId);
         }
 
+        long start = System.currentTimeMillis();
+        MeasurementLog log = new MeasurementLog(video, MeasurementStep.FRAME_EXTRACTION, frameSelector.settings());
+
         // 1. 1초에 1장씩 모두 뽑음 → 2. 보낼 프레임만 고름 → 3. 나머지 파일은 지움 → 4. 고른 프레임을 DB에 저장
         Path outputDir = frameDir.resolve(String.valueOf(videoId));
         List<ExtractedFrame> all = frameExtractor.extract(videoFileStorage.pathOf(video.getStoredName()), outputDir);
         List<ExtractedFrame> selected = frameSelector.select(all);
         deleteUnselected(all, selected, outputDir);
 
-        return selected.stream()
+        List<VideoFrameResponse> responses = selected.stream()
                 .map(frame -> videoFrameRepository.save(
                         new VideoFrame(video, frame.timeSec(), frame.sceneScore(), frame.fileName())))
                 .map(VideoFrameResponse::from)
                 .toList();
+
+        // 5. 측정 로그 저장. 실패하면 트랜잭션이 통째로 취소되므로 성공한 추출만 남음
+        log.recordFrames(all.size(), selected.size());
+        log.finish(true, System.currentTimeMillis() - start);
+        measurementLogRepository.save(log);
+        return responses;
     }
 
     @Transactional(readOnly = true)
