@@ -1,0 +1,17 @@
+측정 로그 첫 기록 (가이드 05, 2026-11-03)
+- 영상: docs/test-data/videos/P1.mp4, 서버: 로컬 bootRun, Jev: jev-1.14.0, 질문 세트 v2
+- 순서: 업로드 → POST frames → POST judgments → POST judgments(한 번 더) → GET measurements
+
+curl 응답 시간
+frames 201 0.828304s
+judgments 201 6.451708s
+judgments again 201 0.069647s
+
+GET /api/videos/69/measurements
+[{"id":16,"step":"FRAME_EXTRACTION","success":true,"startedAt":"2026-11-03T10:05:03.116155","elapsedMs":550,"extractedFrameCount":20,"frameCount":16,"jevCallCount":0,"retryCount":0,"inputTokens":0,"settings":{"windowSeconds":2,"sceneThreshold":0.005}},
+ {"id":17,"step":"JUDGMENT","success":true,"startedAt":"2026-11-03T10:05:03.896277","elapsedMs":6309,"extractedFrameCount":null,"frameCount":16,"jevCallCount":16,"retryCount":0,"inputTokens":44848,"settings":{"questionSetVersion":"v2"}},
+ {"id":18,"step":"JUDGMENT","success":true,"startedAt":"2026-11-03T10:05:10.360041","elapsedMs":0,"extractedFrameCount":null,"frameCount":0,"jevCallCount":0,"retryCount":0,"inputTokens":0,"settings":{"questionSetVersion":"v2"}}]
+
+메모
+- 판단 6.3초. 가이드 03(2026-10-30)에서 같은 P1을 손으로 쟀을 때 4.7초 → Jev 응답 시간은 호출마다 흔들림. 개선 전후 비교는 여러 번 재서 봄
+- 두 번째 판단은 이미 다 판단해서 할 일이 없었음 (frameCount 0, 0ms)

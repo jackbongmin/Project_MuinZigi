@@ -16,6 +16,7 @@ import com.mujinjigi.domain.video.dto.VideoResponse;
 import com.mujinjigi.domain.video.service.VideoService;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
  * 영상 업로드 조회 API
  */
 @RestController

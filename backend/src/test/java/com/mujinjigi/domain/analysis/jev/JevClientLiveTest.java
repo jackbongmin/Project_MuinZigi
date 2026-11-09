@@ -18,11 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
+ * 0단계 · Jev 이미지 요청 보내 보기
  * 실제 Jev API를 호출하는 테스트. 비용과 네트워크가 필요해서 ./gradlew jevTest로만 실행함
  * JevClient만 띄워서 DB 없이도 실행됨
  */
 @Tag("jev")
-@SpringBootTest(classes = JevClient.class)
+@SpringBootTest(classes = {JevConfig.class, JevClient.class})
 class JevClientLiveTest {
 
     @Autowired
@@ -36,7 +37,7 @@ class JevClientLiveTest {
         questions.put("blue_circle", "Is there a blue circle in the image `photo`?");
 
         long start = System.nanoTime();
-        JevResponse response = jevClient.askYesNo(png, "png", questions);
+        JevResponse response = jevClient.askYesNo(png, "png", questions).response();
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
 
         System.out.printf("model=%s, red_square=%.3f, blue_circle=%.3f, input_tokens=%d, elapsed=%dms%n",

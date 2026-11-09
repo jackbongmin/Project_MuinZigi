@@ -14,11 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
+ * 0단계 · 미결제 상황 판단 2차 테스트 (영상 프레임)
  * 0단계: 손님이 들어오기 전(before)과 나간 뒤(after) 진열대 사진을 한 요청에 보내 상품이 사라졌는지 물음
  * 사진은 docs/test-data/shelf/에 있음 (커밋하지 않음). ./gradlew jevTest로만 실행함
  */
 @Tag("jev")
-@SpringBootTest(classes = JevClient.class)
+@SpringBootTest(classes = {JevConfig.class, JevClient.class})
 class JevShelfLiveTest {
 
     private static final Path SHELF_DIR = Path.of("../docs/test-data/shelf");
@@ -58,7 +59,7 @@ class JevShelfLiveTest {
             images.put("after", Files.readAllBytes(SHELF_DIR.resolve(entry.getValue()[1])));
 
             long start = System.nanoTime();
-            JevResponse response = jevClient.askYesNo(images, "jpg", QUESTIONS);
+            JevResponse response = jevClient.askYesNo(images, "jpg", QUESTIONS).response();
             long elapsedMs = (System.nanoTime() - start) / 1_000_000;
 
             StringBuilder line = new StringBuilder(entry.getKey());

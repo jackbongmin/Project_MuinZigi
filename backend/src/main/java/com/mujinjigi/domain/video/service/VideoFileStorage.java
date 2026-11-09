@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
+ * 1단계 · 02 (pathOf 추가)
  * 업로드한 영상 파일을 디스크에 저장함. 배포 때 S3로 바꾸면 이 클래스만 바꾸면됨 ㅇㅇ
  */
 @Component
@@ -34,5 +36,10 @@ public class VideoFileStorage {
             throw new UncheckedIOException("영상 파일 저장 실패 : " + storedName, e);
         }
         return storedName;
+    }
+
+    // 저장 이름으로 디스크의 실제 경로를 돌려줌 (프레임 추출할 때 씀)
+    public Path pathOf(String storedName) {
+        return videoDir.resolve(storedName);
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * 1단계 · 01 (영상 업로드 API)
+ * 1단계 · 06 (영상 조회·확장자 없는 파일 테스트 추가)
  * 영상 업로드 API 테스트. 서버를 실제로 띄우지 않고 MockMvc로 요청을 흉내 냄
  * DB는 Docker PostgreSQL을 쓰고, 테스트가 끝나면 @Transactional로 저장한 내용을 되돌림
  */
@@ -52,6 +54,27 @@ public class VideoControllerTest {
 
         mockMvc.perform(multipart("/api/videos").file(file))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 확장자가_없는_파일은_400을_돌려준다() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "P1", "video/mp4", new byte[1024]);
+
+        mockMvc.perform(multipart("/api/videos").file(file))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 올린_영상을_조회하면_200과_영상_정보를_돌려준다() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "P1.mp4", "video/mp4", new byte[1024]);
+        String location = mockMvc.perform(multipart("/api/videos").file(file))
+                .andReturn().getResponse().getHeader("Location");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.originalName").value("P1.mp4"))
+                .andExpect(jsonPath("$.sizeBytes").value(1024))
+                .andExpect(jsonPath("$.uploadedAt").exists());
     }
 
     @Test
