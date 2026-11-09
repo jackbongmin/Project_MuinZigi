@@ -13,6 +13,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withTooManyRequests;
 
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.Base64;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.springframework.web.client.RestClient;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
+ * 1단계 · 06 (연결 실패·API 키 없음 테스트 추가)
  * JevClient 테스트. 진짜 Jev 대신 가짜 서버(MockRestServiceServer)가 정해 둔 응답을 돌려줌
  * Spring 없이 객체를 직접 만들어서 빠르게 확인함
  */
@@ -129,4 +131,36 @@ class JevClientTest {
         assertThat(e.getAttempts().get(0).responseBody()).contains("invalid question");
         server.verify();
     }
+
+    @Test
+    void 연결이_끝까지_안_되면_시도_기록을_담아_예외를_던진다() {
+        // 첫 시도 + 재시도 2번 모두 연결 거부 (Jev 서버가 꺼져 있거나 네트워크가 끊긴 경우)
+        for (int i = 0; i < 3; i++) {
+            server.expect(requestTo(URL)).andRespond(withException(new ConnectException("Connection refused")));
+        }
+
+        JevCallException e = assertThrows(JevCallException.class,
+                () -> jevClient.askYesNo(IMAGE, "jpg", QUESTIONS));
+
+        assertThat(e.getMessage()).contains("연결 실패");
+        assertThat(e.getAttempts()).hasSize(3);
+        assertThat(e.getAttempts()).extracting(JevCallAttempt::statusCode).containsOnlyNulls();
+        assertThat(e.getAttempts().get(2).error()).contains("Connection refused");
+        server.verify();
+    }
+
+    @Test
+    void API_키가_비어_있으면_요청을_보내지_않는다() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://jev.test");
+        MockRestServiceServer emptyServer = MockRestServiceServer.bindTo(builder).build();
+        JevClient noKeyClient = new JevClient(builder.build(), "jev-1.14.0", " ", 2, 0);
+
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> noKeyClient.askYesNo(IMAGE, "jpg", QUESTIONS));
+
+        assertThat(e.getMessage()).contains("JEV_API_KEY");
+        // 기대한 요청을 하나도 등록하지 않았으므로, 요청이 한 번이라도 갔다면 여기서 실패함
+        emptyServer.verify();
+    }
+
 }

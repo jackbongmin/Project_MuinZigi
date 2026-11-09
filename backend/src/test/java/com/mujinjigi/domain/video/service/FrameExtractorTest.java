@@ -1,6 +1,7 @@
 package com.mujinjigi.domain.video.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import com.mujinjigi.domain.video.TestVideos;
 
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
+ * 1단계 · 06 (FFmpeg 실패 테스트 추가)
  * FFmpeg를 실제로 실행해 프레임과 장면 변화 점수를 뽑는지 확인함 (PATH에 ffmpeg가 있어야 함)
  */
 class FrameExtractorTest {
@@ -36,5 +38,17 @@ class FrameExtractorTest {
         // 프레임 파일이 실제로 생김
         assertThat(tempDir.resolve("frames").resolve(frames.get(0).fileName())).exists();
         assertThat(Files.list(tempDir.resolve("frames")).filter(p -> p.toString().endsWith(".jpg"))).hasSize(6);
+    }
+
+    @Test
+    void 영상이_아닌_파일이면_FFmpeg_실패_예외를_던진다() throws Exception {
+        // 확장자만 mp4이고 내용은 글자인 파일 → FFmpeg가 읽지 못해 종료 코드 0이 아닌 값으로 끝남
+        Path notVideo = Files.writeString(tempDir.resolve("fake.mp4"), "not a video");
+        FrameExtractor extractor = new FrameExtractor("ffmpeg");
+
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> extractor.extract(notVideo, tempDir.resolve("frames")));
+
+        assertThat(e.getMessage()).contains("FFmpeg 실패");
     }
 }
