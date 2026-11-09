@@ -1,0 +1,5 @@
+paid_at,transaction_id,product_code,product_name,quantity,unit_price,amount,type
+2026-11-09 14:03:21,T0001,P-CHOCO,초코바,2,1500,3000,PAY
+2026-11-09 14:05:02,T0002,P-COLA,콜라,1,2000,2000,PAY
+2026-11-09 14:05:02,T0002,P-CHIPS,감자칩,1,1800,1800,PAY
+2026-11-09 14:10:40,T0003,P-COLA,콜라,1,2000,2000,CANCEL
