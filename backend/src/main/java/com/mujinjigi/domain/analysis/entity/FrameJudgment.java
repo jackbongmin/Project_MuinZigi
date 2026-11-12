@@ -19,7 +19,8 @@ import jakarta.persistence.Table;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 한 장에 대한 Jev 판단 결과. 질문마다 "예"일 확률을 저장함
+ * 프레임 한 장을 Jev에 물어본 결과(질문마다 "예"일 확률)를 DB(frame_judgments 테이블)에 저장하는 엔티티
+ * 예: 11초 프레임 → person 0.98, holding_product 0.12, putting_in_bag 0.03, paying 0.01
  */
 @Entity
 @Table(name = "frame_judgments")

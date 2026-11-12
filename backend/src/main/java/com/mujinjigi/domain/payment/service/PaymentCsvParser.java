@@ -12,7 +12,9 @@ import com.mujinjigi.domain.payment.entity.PaymentType;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV 글자를 읽어 줄마다 PaymentCsvRow로 바꿈. 틀린 줄이 있으면 몇 번째 줄이 왜 틀렸는지 알려 주고 멈춤
+ * 결제 CSV 글자를 한 줄씩 읽고 검사해서 PaymentCsvRow 목록으로 바꾸는 클래스. 틀린 줄이 있으면 몇 번째 줄이 왜 틀렸는지 알려 주고 멈춤
+ * 예: "2026-11-09 14:03:21,T0001,P-CHOCO,초코바,2,1500,3000,PAY" → PaymentCsvRow(수량 2, 단가 1500, 금액 3000, PAY)
+ * 예: amount 칸이 quantity × unit_price와 다르면 → "2번째 줄: amount가 quantity × unit_price와 다름"
  * DB·Spring 없이 동작해서 단위 테스트로 바로 확인함
  */
 @Component

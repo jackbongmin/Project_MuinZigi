@@ -12,7 +12,8 @@ import jakarta.persistence.Table;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV파일 하나를 올린 단위. 결제 기록 여러 줄을 묶고 화면에 보여줄 요약(줄 수, 결제 합계)을 함께 저장함
+ * 결제 CSV 파일 하나를 올린 기록을 DB(payment_uploads 테이블)에 저장하는 엔티티. 결제 기록 여러 줄을 묶고 요약을 같이 저장함
+ * 예: sample_kiosk.csv → 4줄, 결제 합계 6,800원
  */
 
 @Entity

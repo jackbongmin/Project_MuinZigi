@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 0단계 · Jev 이미지 요청 보내 보기
- * Jev 응답. 지금 쓰는 필드만 받고 나머지는 무시함
+ * Jev가 돌려준 JSON 응답을 담는 그릇. 지금 쓰는 칸(모델 이름, 질문별 답, 토큰 수)만 받고 나머지는 무시함
+ * 예: {"model": "jev-1.14.0", "answers": {"person": {"type": "noul", "noul": 0.98}}, "usage": {"input_tokens": 2803, ...}}
  *
  * @param model   실제로 답한 모델 이름 (로그에 남길 값)
  * @param answers 질문 이름 → 답

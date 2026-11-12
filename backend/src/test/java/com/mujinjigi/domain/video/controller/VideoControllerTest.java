@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 1단계 · 01 (영상 업로드 API)
  * 1단계 · 06 (영상 조회·확장자 없는 파일 테스트 추가)
- * 영상 업로드 API 테스트. 서버를 실제로 띄우지 않고 MockMvc로 요청을 흉내 냄
+ * 영상 업로드·조회 API 테스트. 서버를 실제로 띄우지 않고 MockMvc로 요청을 흉내 냄
+ * 확인하는 것: 업로드 201, 영상 아닌 파일·빈 파일·확장자 없는 파일 400, 조회 200, 없는 영상 404
  * DB는 Docker PostgreSQL을 쓰고, 테스트가 끝나면 @Transactional로 저장한 내용을 되돌림
  */
 @SpringBootTest(properties = "app.storage.video-dir=build/test-uploads")

@@ -9,7 +9,8 @@ import com.mujinjigi.domain.analysis.entity.FrameJudgment;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * FrameJudgment 저장·조회
+ * frame_judgments 테이블에서 판단 결과를 저장·조회하는 저장소
+ * 예: findAllWithFrame(69, "v2") → 영상 69번의 v2 판단 16개를 프레임 시각 순으로 (프레임 정보까지 쿼리 한 번에)
  */
 public interface FrameJudgmentRepository extends JpaRepository<FrameJudgment, Long> {
 

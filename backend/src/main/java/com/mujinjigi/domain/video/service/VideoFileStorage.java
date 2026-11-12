@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 1단계 · 01 (영상 업로드 API)
  * 1단계 · 02 (pathOf 추가)
- * 업로드한 영상 파일을 디스크에 저장함. 배포 때 S3로 바꾸면 이 클래스만 바꾸면됨 ㅇㅇ
+ * 업로드한 영상 파일을 디스크 폴더(uploads/videos)에 저장하고, 저장된 파일 위치를 알려 주는 클래스
+ * 예: P1.mp4 업로드 → uploads/videos/(겹치지 않는 새 이름).mp4로 저장
+ * 배포 때 S3로 옮기면 이 클래스만 바꾸면 됨
  */
 @Component
 public class VideoFileStorage {

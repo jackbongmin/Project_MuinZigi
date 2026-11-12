@@ -15,8 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * 0단계 · 미결제 상황 판단 2차 테스트 (영상 프레임)
- * 0단계: 손님이 들어오기 전(before)과 나간 뒤(after) 진열대 사진을 한 요청에 보내 상품이 사라졌는지 물음
- * 사진은 docs/test-data/shelf/에 있음 (커밋하지 않음). ./gradlew jevTest로만 실행함
+ * 실험용 테스트: 손님이 들어오기 전(before)과 나간 뒤(after) 진열대 사진을 한 요청에 보내 상품이 사라졌는지 물음. ./gradlew jevTest로만 실행함
+ * 예: before 사진에 있던 상품이 after 사진에 없으면 "사라졌나" 확률이 높게 나오는지 봄
+ * 사진은 docs/test-data/shelf/에 있음 (커밋하지 않음)
  */
 @Tag("jev")
 @SpringBootTest(classes = {JevConfig.class, JevClient.class})

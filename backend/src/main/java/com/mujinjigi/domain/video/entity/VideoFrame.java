@@ -12,7 +12,8 @@ import jakarta.persistence.Table;
 
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
- * 영상에서 뽑아 Jev에 보낼 프레임 한 장. 이미지 파일은 디스크에 두고 DB에는 위치와 시각만 저장함
+ * 영상에서 뽑아 Jev에 보낼 프레임 한 장의 정보를 DB(video_frames 테이블)에 저장하는 엔티티. 이미지 파일은 디스크에 두고 DB에는 파일 이름과 시각만 저장함
+ * 예: 영상 69번의 11초 프레임 → timeSec 11.0, sceneScore 0.031, fileName frame_0012.jpg
  */
 
 @Entity

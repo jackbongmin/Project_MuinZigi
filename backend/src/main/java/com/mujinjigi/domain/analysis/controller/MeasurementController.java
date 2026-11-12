@@ -12,7 +12,8 @@ import com.mujinjigi.domain.analysis.service.MeasurementService;
 
 /**
  * 1단계 · 05 (측정 로그)
- * 측정 로그 조회 API
+ * 측정 로그 조회 API 요청을 받는 클래스
+ * GET /api/videos/{id}/measurements → 그 영상의 프레임 추출·판단을 실행할 때마다 남긴 측정값 목록
  */
 @RestController
 @RequestMapping("/api/videos/{videoId}/measurements")

@@ -17,7 +17,8 @@ import com.mujinjigi.domain.video.service.VideoService;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 영상 업로드 조회 API
+ * 영상 업로드·조회 API 요청을 받는 클래스
+ * POST /api/videos → 영상 파일 업로드 / GET /api/videos/{id} → 영상 정보
  */
 @RestController
 @RequestMapping("/api/videos")

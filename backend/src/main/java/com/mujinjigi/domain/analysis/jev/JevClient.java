@@ -20,7 +20,9 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * 0단계 · Jev 이미지 요청 보내 보기
  * 1단계 · 04 (재시도, 요청·응답 원문 기록)
- * Jev(TypeSafe) API를 HTTP로 직접 호출함. 공식 SDK가 Python, JavaScript만 있기 때문
+ * Jev(TypeSafe) API에 이미지와 질문을 HTTP로 보내고 답(질문별 "예" 확률)을 받아 오는 클래스. 실패하면 정해진 횟수만큼 재시도함
+ * 예: 프레임 이미지 + 질문 4개 → person 0.98, putting_in_bag 0.03, ...
+ * 공식 SDK가 Python, JavaScript만 있어서 HTTP로 직접 호출함
  */
 @Component
 public class JevClient {

@@ -16,7 +16,8 @@ import com.mujinjigi.domain.analysis.service.JudgmentService;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 Jev 판단 API
+ * 프레임 판단 API 요청을 받는 클래스
+ * POST /api/videos/{id}/judgments → 프레임을 Jev에 보내 판단하고 결과 목록을 돌려줌 / GET → 저장된 판단 목록
  */
 @RestController
 @RequestMapping("/api/videos/{videoId}/judgments")

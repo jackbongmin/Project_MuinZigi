@@ -6,7 +6,8 @@ import com.mujinjigi.domain.analysis.entity.JevCallLog;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * JevCallLog 저장·조회
+ * jev_call_logs 테이블에서 Jev 호출 기록을 저장·조회하는 저장소
+ * 예: countByFrameVideoId(69) → 영상 69번 프레임들에 대해 Jev에 요청을 보낸 횟수 (재시도 포함)
  */
 public interface JevCallLogRepository extends JpaRepository<JevCallLog, Long> {
 

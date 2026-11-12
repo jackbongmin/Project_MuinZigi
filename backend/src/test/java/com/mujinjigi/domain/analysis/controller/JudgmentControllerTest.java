@@ -42,7 +42,8 @@ import com.mujinjigi.domain.video.TestVideos;
 /**
  * 1단계 · 03 (Jev 프레임 판단)
  * 1단계 · 04 (호출 기록, Jev 실패 시 502)
- * 프레임 판단 API 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
+ * 판단 API를 실제 순서(영상 업로드 → 프레임 추출 → 판단)대로 불러 보는 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
+ * 확인하는 것: 판단 저장·조회, 이미 판단한 프레임 건너뛰기, Jev 실패 시 502, 추출 전 409, 없는 영상 404
  */
 @SpringBootTest(properties = {
         "app.storage.video-dir=build/test-uploads",

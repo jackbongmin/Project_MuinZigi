@@ -19,7 +19,8 @@ import com.mujinjigi.domain.payment.service.PaymentService;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV 업로드와 조회 API
+ * 결제 CSV API 요청을 받는 클래스
+ * POST /api/payments → CSV 업로드·저장 / GET /api/payments/{id} → 업로드 요약 / GET /api/payments/{id}/records → 결제 기록 목록
  */
 @RestController
 @RequestMapping("/api/payments")

@@ -37,7 +37,8 @@ import com.mujinjigi.domain.video.TestVideos;
 
 /**
  * 1단계 · 05 (측정 로그)
- * 측정 로그 API 테스트. 프레임 추출·판단을 실제로 돌린 뒤 남은 측정 로그를 조회함 (Jev는 가짜)
+ * 측정 로그 API 테스트. 프레임 추출·판단을 실제로 돌린 뒤 단계마다 측정 로그가 남았는지 조회해서 확인함 (Jev는 가짜)
+ * 확인하는 것: 추출·판단마다 한 줄, 재시도 수 집계, Jev 실패해도 실패 로그 남김, 없는 영상 404
  */
 @SpringBootTest(properties = {
         "app.storage.video-dir=build/test-uploads",

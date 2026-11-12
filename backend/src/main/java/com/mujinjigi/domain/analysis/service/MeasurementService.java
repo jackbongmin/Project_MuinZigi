@@ -13,7 +13,8 @@ import com.mujinjigi.domain.video.repository.VideoRepository;
 
 /**
  * 1단계 · 05 (측정 로그)
- * 영상 하나의 측정 로그를 조회함. 저장은 각 단계의 서비스(FrameService, JudgmentService)가 함
+ * 영상 하나의 측정 로그를 꺼내 보여 주는 클래스. 저장은 각 단계의 서비스(FrameService, JudgmentService)가 함
+ * 예: 영상 69번 → [프레임 추출 1줄, 판단 1줄]
  */
 @Service
 public class MeasurementService {

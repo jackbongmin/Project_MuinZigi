@@ -16,7 +16,8 @@ import com.mujinjigi.domain.video.repository.VideoRepository;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 영상 업로드와 조회
+ * 업로드한 영상을 디스크(VideoFileStorage)와 DB(videos 테이블)에 저장하고, 영상 정보를 조회하는 클래스
+ * 흐름: 빈 파일·확장자 검사 → 디스크에 저장 → DB에 정보 저장 → 응답
  */
 @Service
 public class VideoService {

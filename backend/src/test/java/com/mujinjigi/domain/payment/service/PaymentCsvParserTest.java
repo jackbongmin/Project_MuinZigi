@@ -12,7 +12,8 @@ import com.mujinjigi.domain.payment.entity.PaymentType;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * PaymentCsvParser 단위 테스트. Spring·DB 없이 글자를 넣고 결과만 확인함
+ * PaymentCsvParser가 CSV를 제대로 읽고 틀린 줄을 잡아내는지 확인하는 테스트. Spring·DB 없이 글자를 넣고 결과만 확인함
+ * 예: 금액이 수량 × 단가와 다른 줄을 넣으면 → "N번째 줄: ..." 예외가 나는지
  */
 class PaymentCsvParserTest {
 

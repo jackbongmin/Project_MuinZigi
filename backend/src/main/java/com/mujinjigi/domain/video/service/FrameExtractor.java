@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
- * FFmpeg로 영상에서 1초에 1장씩 프레임을 뽑고, 프레임마다 장면 변화 점수를 함께 구함
+ * FFmpeg를 실행해 영상에서 1초에 1장씩 프레임 이미지를 뽑고, 프레임마다 장면 변화 점수(scene 점수)를 함께 구하는 클래스
+ * 예: 20초짜리 P1.mp4 → frame_0001.jpg ~ frame_0020.jpg + 장마다 점수(0~1)
  */
 @Component
 public class FrameExtractor {

@@ -11,7 +11,8 @@ import org.springframework.web.client.RestClient;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * Jev에 요청을 보낼 RestClient를 만듦. 주소·인증·시간 제한을 여기서 한 번만 정함
+ * Jev에 요청을 보낼 도구(RestClient)를 만들어 Spring에 등록하는 설정 클래스. 주소·API 키·시간 제한을 여기서 한 번만 정함
+ * 예: 주소 https://api.typesafe.ai, 연결 5초·응답 30초가 넘으면 끊음
  * JevClient 밖에서 만들어 넘기므로, 테스트에서는 가짜 서버에 연결된 RestClient를 넣을 수 있음
  */
 @Configuration

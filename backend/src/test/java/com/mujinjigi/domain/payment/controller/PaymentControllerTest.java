@@ -23,7 +23,8 @@ import com.mujinjigi.domain.payment.service.PaymentCsvParser;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV API 테스트. 실제 DB에 저장하고 테스트가 끝나면 되돌림
+ * 결제 CSV API를 실제 DB에 저장해 가며 불러 보는 테스트. 테스트가 끝나면 저장한 내용을 되돌림
+ * 확인하는 것: 업로드 요약·기록 조회, 틀린 줄 400과 줄 번호(아무것도 저장 안 됨), CSV 아닌 파일·빈 파일 400, 없는 업로드 404
  */
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -26,7 +26,8 @@ import com.mujinjigi.domain.video.repository.VideoRepository;
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
  * 1단계 · 05 (추출 측정 로그 저장)
- * 영상에서 프레임을 뽑고, Jev에 보낼 프레임만 골라 저장함
+ * 영상에서 프레임을 뽑고(FrameExtractor), Jev에 보낼 것만 골라(FrameSelector) DB(video_frames 테이블)에 저장하는 클래스
+ * 흐름: 영상 파일 찾기 → 1초 1장 추출 → 고르기 → 고른 프레임만 저장 → 측정 로그 저장
  */
 @Service
 public class FrameService {

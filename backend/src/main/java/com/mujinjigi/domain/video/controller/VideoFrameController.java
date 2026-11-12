@@ -15,7 +15,8 @@ import com.mujinjigi.domain.video.service.FrameService;
 
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
- * 영상 프레임 추출·조회 API
+ * 프레임 추출·조회 API 요청을 받는 클래스
+ * POST /api/videos/{id}/frames → 영상에서 프레임을 뽑아 저장 / GET → 저장된 프레임 목록
  */
 @RestController
 @RequestMapping("/api/videos/{videoId}/frames")

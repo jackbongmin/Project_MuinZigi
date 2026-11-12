@@ -22,7 +22,8 @@ import com.mujinjigi.domain.payment.repository.PaymentUploadRepository;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV를 읽어 업로드 한 건과 결제 기록 여러 줄로 저장하고, 다시 조회함
+ * 결제 CSV 파일을 받아 PaymentCsvParser로 검사하고, 업로드 한 건과 결제 기록 여러 줄로 저장하는 클래스. 저장한 것을 다시 조회도 함
+ * 흐름: 빈 파일·확장자 검사 → 줄마다 검사 → 결제 합계 계산 → 업로드·기록 저장 (틀린 줄이 하나라도 있으면 아무것도 저장 안 함)
  */
 @Service
 public class PaymentService {

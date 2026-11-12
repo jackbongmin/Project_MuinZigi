@@ -38,7 +38,9 @@ import com.mujinjigi.domain.video.service.FrameService;
  * 1단계 · 03 (Jev 프레임 판단)
  * 1단계 · 04 (Jev 호출 기록 저장, 실패 시 502)
  * 1단계 · 05 (판단 측정 로그 저장)
- * 저장된 프레임을 Jev에 보내 판단 결과를 저장함
+ * 영상의 프레임 이미지를 하나씩 Jev에 보내 판단 결과를 frame_judgments 테이블에 저장하는 클래스
+ * 흐름: 프레임 목록 읽기 → 이미 판단한 프레임은 건너뜀 → Jev 호출 → 결과·호출 기록 저장 → 측정 로그 저장
+ * Jev가 재시도까지 실패하면 502를 돌려줌. 다시 부르면 남은 프레임부터 이어서 판단함
  */
 @Service
 public class JudgmentService {

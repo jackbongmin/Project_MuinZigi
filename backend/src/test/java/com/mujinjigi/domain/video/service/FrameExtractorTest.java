@@ -15,7 +15,8 @@ import com.mujinjigi.domain.video.TestVideos;
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
  * 1단계 · 06 (FFmpeg 실패 테스트 추가)
- * FFmpeg를 실제로 실행해 프레임과 장면 변화 점수를 뽑는지 확인함 (PATH에 ffmpeg가 있어야 함)
+ * FrameExtractor가 FFmpeg를 실제로 실행해 프레임과 장면 변화 점수를 뽑는지 확인하는 테스트 (PATH에 ffmpeg가 있어야 함)
+ * 예: 검은 3초 → 흰 3초 영상 → 1초에 1장 뽑히고 3초 프레임 점수가 높은지 / 영상이 아닌 파일이면 예외가 나는지
  */
 class FrameExtractorTest {
 

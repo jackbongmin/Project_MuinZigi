@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * 1단계 · 02 (프레임 추출과 고르기)
- * 프레임 고르기 규칙 테스트. Spring 없이 객체를 직접 만들어 빠르게 확인함
+ * FrameSelector가 움직임 앞뒤 2초를 제대로 고르는지 확인하는 테스트. Spring 없이 객체를 직접 만들어 빠르게 확인함
+ * 예: 5초에만 움직임 → 3~7초를 고르는지
  */
 class FrameSelectorTest {
 

@@ -17,7 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * 0단계 · 미결제 상황 판단 2차 테스트 (영상 프레임)
- * 0단계: 영상에서 뽑은 프레임에 질문 세트를 보내고 확률을 출력함. ./gradlew jevTest로만 실행함
+ * 실험용 테스트: 영상에서 뽑은 프레임에 질문 세트를 보내고 질문별 확률을 출력함. ./gradlew jevTest로만 실행함
+ * 예: P2 영상 7초 프레임 → putting_in_bag 확률을 찍어 보고 정답표와 비교함
  * 프레임은 docs/test-data/frames/<장면 코드>/에 있음 (FFmpeg로 1초에 1장, 커밋하지 않음)
  */
 @Tag("jev")

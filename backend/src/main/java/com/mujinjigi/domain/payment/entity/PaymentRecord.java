@@ -16,8 +16,9 @@ import jakarta.persistence.Table;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 키오스크 결제 CSV의 한 줄. 금액, 수량은 원 단위 long으로 저장함
- * (double은 0.1 같은 값을 정확히 못담아 합계에 오차가 생김)
+ * 키오스크 결제 CSV의 한 줄을 DB(payment_records 테이블)에 저장하는 엔티티
+ * 예: 2026-11-09 14:03:21, T0001, P-CHOCO 초코바 2개 × 1,500원 = 3,000원, PAY
+ * 금액·수량은 원 단위 long으로 저장함 (double은 0.1 같은 값을 정확히 못 담아 합계에 오차가 생김)
  */
 
 @Entity

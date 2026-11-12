@@ -12,7 +12,8 @@ import jakarta.persistence.Table;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 업로드한 녹화본 한 개. 파일 자체는 디스크에 두고, DB에는 파일을 찾을 정보만 저장함
+ * 업로드한 녹화본 하나의 정보를 DB(videos 테이블)에 저장하는 엔티티. 파일 자체는 디스크에 두고 DB에는 파일을 찾을 정보만 저장함
+ * 예: P1.mp4 업로드 → originalName P1.mp4, storedName (디스크에 저장한 이름), sizeBytes, uploadedAt
  */
 
 @Entity

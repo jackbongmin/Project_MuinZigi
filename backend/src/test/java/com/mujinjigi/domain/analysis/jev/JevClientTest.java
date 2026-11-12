@@ -32,7 +32,8 @@ import org.springframework.web.client.RestClient;
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
  * 1단계 · 06 (연결 실패·API 키 없음 테스트 추가)
- * JevClient 테스트. 진짜 Jev 대신 가짜 서버(MockRestServiceServer)가 정해 둔 응답을 돌려줌
+ * JevClient가 요청을 제대로 만들고, 실패하면 재시도하는지 확인하는 테스트. 진짜 Jev 대신 가짜 서버(MockRestServiceServer)가 정해 둔 응답을 돌려줌
+ * 예: 가짜 서버가 529 → 200 순서로 답하면 → 2번 시도하고 성공하는지
  * Spring 없이 객체를 직접 만들어서 빠르게 확인함
  */
 class JevClientTest {

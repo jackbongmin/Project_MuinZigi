@@ -19,7 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * 0단계 · Jev 이미지 요청 보내 보기
- * 실제 Jev API를 호출하는 테스트. 비용과 네트워크가 필요해서 ./gradlew jevTest로만 실행함
+ * 실제 Jev API를 호출해 보는 실험용 테스트. 비용과 네트워크가 필요해서 ./gradlew jevTest로만 실행함
+ * 예: 400x400 이미지 1장 + 질문 2개 → 입력 758토큰, 약 0.9초 (0단계 측정)
  * JevClient만 띄워서 DB 없이도 실행됨
  */
 @Tag("jev")
