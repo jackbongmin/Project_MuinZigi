@@ -161,7 +161,8 @@ import org.springframework.web.client.RestClient;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * Jev에 요청을 보낼 RestClient를 만듦. 주소·인증·시간 제한을 여기서 한 번만 정함
+ * Jev에 요청을 보낼 도구(RestClient)를 만들어 Spring에 등록하는 설정 클래스. 주소·API 키·시간 제한을 여기서 한 번만 정함
+ * 예: 주소 https://api.typesafe.ai, 연결 5초·응답 30초가 넘으면 끊음
  * JevClient 밖에서 만들어 넘기므로, 테스트에서는 가짜 서버에 연결된 RestClient를 넣을 수 있음
  */
 @Configuration
@@ -197,7 +198,8 @@ import java.time.LocalDateTime;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * Jev 호출 한 번(시도 한 번)의 결과. 재시도하면 시도마다 하나씩 생김
+ * Jev에 요청을 한 번 보낸 결과(상태 코드, 응답 원문, 걸린 시간). 재시도하면 시도마다 하나씩 생김
+ * 예: (2, 14:03:21, 200, "{...}", null, 310) → 2번째 시도에서 성공, 310ms 걸림
  *
  * @param attempt      몇 번째 시도인지 (1부터)
  * @param calledAt     이 시도를 보낸 시각. 재시도 사이에 얼마나 기다렸는지 볼 수 있음
@@ -221,7 +223,8 @@ import java.util.List;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * Jev 호출 성공 결과. 읽은 응답과 함께, 로그로 남길 요청 원문과 시도 기록을 담음
+ * Jev 호출이 성공했을 때 돌려주는 묶음: 읽은 응답 + 로그로 남길 요청 원문 + 시도 기록
+ * 예: 1번째 시도 529, 2번째 시도 200 → attempts에 2개, 마지막 것이 성공한 시도
  *
  * @param response    읽은 응답
  * @param requestBody 보낸 요청 본문 원문 (이미지 base64는 크기만 남기고 뺌)
@@ -239,7 +242,8 @@ import java.util.List;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * 재시도까지 했는데도 Jev 호출이 실패함. 실패한 시도 기록도 로그로 남길 수 있게 같이 담음
+ * 재시도까지 다 했는데도 Jev 호출이 실패했을 때 던지는 예외. 실패한 시도 기록을 같이 담아서 로그로 남길 수 있게 함
+ * 예: 529가 3번 연속 → "Jev 호출 실패: 상태 코드 529, 3번 시도" + 시도 기록 3개
  */
 public class JevCallException extends RuntimeException {
 
@@ -288,7 +292,9 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * 0단계 · Jev 이미지 요청 보내 보기
  * 1단계 · 04 (재시도, 요청·응답 원문 기록)
- * Jev(TypeSafe) API를 HTTP로 직접 호출함. 공식 SDK가 Python, JavaScript만 있기 때문
+ * Jev(TypeSafe) API에 이미지와 질문을 HTTP로 보내고 답(질문별 "예" 확률)을 받아 오는 클래스. 실패하면 정해진 횟수만큼 재시도함
+ * 예: 프레임 이미지 + 질문 4개 → person 0.98, putting_in_bag 0.03, ...
+ * 공식 SDK가 Python, JavaScript만 있어서 HTTP로 직접 호출함
  */
 @Component
 public class JevClient {
@@ -462,9 +468,9 @@ import jakarta.persistence.Table;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * Jev 호출 시도 한 번의 기록. 성공·실패와 상관없이 시도마다 한 줄씩 남김
- * 판단이 이상할 때 Jev가 실제로 무엇을 받고 무엇을 답했는지 원문으로 확인하려고 둠
- * 아직 읽는 곳이 없어서 getter는 두지 않음 (측정 로그에서 읽을 때 추가)
+ * Jev에 요청을 한 번 보낼 때마다(재시도 포함) 보낸 내용·받은 응답·걸린 시간을 DB(jev_call_logs 테이블)에 남기는 엔티티
+ * 예: 11초 프레임 → 1번째 시도 상태 529, 2번째 시도 상태 200 (310ms) → 두 줄이 남음
+ * 판단이 이상할 때 Jev가 실제로 무엇을 받고 무엇을 답했는지 원문으로 확인하려고 둠. 아직 읽는 곳이 없어서 getter는 두지 않음
  */
 @Entity
 @Table(name = "jev_call_logs")
@@ -534,7 +540,8 @@ import com.mujinjigi.domain.analysis.entity.JevCallLog;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * JevCallLog 저장·조회
+ * jev_call_logs 테이블에서 Jev 호출 기록을 저장·조회하는 저장소
+ * 예: countByFrameVideoId(69) → 영상 69번 프레임들에 대해 Jev에 요청을 보낸 횟수 (재시도 포함)
  */
 public interface JevCallLogRepository extends JpaRepository<JevCallLog, Long> {
 
@@ -581,7 +588,9 @@ import com.mujinjigi.domain.video.service.FrameService;
 /**
  * 1단계 · 03 (Jev 프레임 판단)
  * 1단계 · 04 (Jev 호출 기록 저장, 실패 시 502)
- * 저장된 프레임을 Jev에 보내 판단 결과를 저장함
+ * 영상의 프레임 이미지를 하나씩 Jev에 보내 판단 결과를 frame_judgments 테이블에 저장하는 클래스
+ * 흐름: 프레임 목록 읽기 → 이미 판단한 프레임은 건너뜀 → Jev 호출 → 결과·호출 기록 저장 → 측정 로그 저장
+ * Jev가 재시도까지 실패하면 502를 돌려줌. 다시 부르면 남은 프레임부터 이어서 판단함
  */
 @Service
 public class JudgmentService {
@@ -723,7 +732,8 @@ import org.springframework.web.client.RestClient;
 
 /**
  * 1단계 · 04 (Jev 재시도와 원문 로그)
- * JevClient 테스트. 진짜 Jev 대신 가짜 서버(MockRestServiceServer)가 정해 둔 응답을 돌려줌
+ * JevClient가 요청을 제대로 만들고, 실패하면 재시도하는지 확인하는 테스트. 진짜 Jev 대신 가짜 서버(MockRestServiceServer)가 정해 둔 응답을 돌려줌
+ * 예: 가짜 서버가 529 → 200 순서로 답하면 → 2번 시도하고 성공하는지
  * Spring 없이 객체를 직접 만들어서 빠르게 확인함
  */
 class JevClientTest {
@@ -877,7 +887,8 @@ import com.mujinjigi.domain.video.TestVideos;
 /**
  * 1단계 · 03 (Jev 프레임 판단)
  * 1단계 · 04 (호출 기록, Jev 실패 시 502)
- * 프레임 판단 API 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
+ * 판단 API를 실제 순서(영상 업로드 → 프레임 추출 → 판단)대로 불러 보는 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
+ * 확인하는 것: 판단 저장·조회, 이미 판단한 프레임 건너뛰기, Jev 실패 시 502, 추출 전 409, 없는 영상 404
  */
 @SpringBootTest(properties = {
         "app.storage.video-dir=build/test-uploads",

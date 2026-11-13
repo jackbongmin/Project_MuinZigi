@@ -134,7 +134,8 @@ import jakarta.persistence.Table;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 업로드한 녹화본 한 개. 파일 자체는 디스크에 두고, DB에는 파일을 찾을 정보만 저장함
+ * 업로드한 녹화본 하나의 정보를 DB(videos 테이블)에 저장하는 엔티티. 파일 자체는 디스크에 두고 DB에는 파일을 찾을 정보만 저장함
+ * 예: P1.mp4 업로드 → originalName P1.mp4, storedName (디스크에 저장한 이름), sizeBytes, uploadedAt
  */
 @Entity
 @Table(name = "videos")
@@ -204,7 +205,8 @@ import com.mujinjigi.domain.video.entity.Video;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * Video 저장·조회. save, findById 같은 기본 메서드는 JpaRepository가 만들어 줌
+ * videos 테이블에서 영상 정보를 저장·조회하는 저장소. save, findById 같은 기본 메서드는 JpaRepository가 만들어 줌
+ * 예: findById(69) → 영상 69번 정보 (없으면 빈 Optional)
  */
 public interface VideoRepository extends JpaRepository<Video, Long> {
 }
@@ -223,7 +225,8 @@ import com.mujinjigi.domain.video.entity.Video;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 영상 정보를 API로 돌려줄 때 쓰는 응답 형식. 엔티티를 그대로 내보내지 않고 필요한 값만 담음
+ * 영상 API가 돌려주는 JSON의 모양. 엔티티를 그대로 내보내지 않고 필요한 값만 담음
+ * 예: {"id": 69, "originalName": "P1.mp4", "sizeBytes": 1234567, "uploadedAt": "2026-11-03T10:12:00"}
  */
 public record VideoResponse(Long id, String originalName, long sizeBytes, LocalDateTime uploadedAt) {
 
@@ -255,7 +258,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 업로드한 영상 파일을 디스크에 저장함. 배포 때 S3로 바꾸면 이 클래스만 바뀌면 됨
+ * 업로드한 영상 파일을 디스크 폴더(uploads/videos)에 저장하고, 저장된 파일 위치를 알려 주는 클래스
+ * 예: P1.mp4 업로드 → uploads/videos/(겹치지 않는 새 이름).mp4로 저장
+ * 배포 때 S3로 옮기면 이 클래스만 바꾸면 됨
  */
 @Component
 public class VideoFileStorage {
@@ -305,7 +310,8 @@ import com.mujinjigi.domain.video.repository.VideoRepository;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 영상 업로드와 조회
+ * 업로드한 영상을 디스크(VideoFileStorage)와 DB(videos 테이블)에 저장하고, 영상 정보를 조회하는 클래스
+ * 흐름: 빈 파일·확장자 검사 → 디스크에 저장 → DB에 정보 저장 → 응답
  */
 @Service
 public class VideoService {
@@ -378,7 +384,8 @@ import com.mujinjigi.domain.video.service.VideoService;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 영상 업로드·조회 API
+ * 영상 업로드·조회 API 요청을 받는 클래스
+ * POST /api/videos → 영상 파일 업로드 / GET /api/videos/{id} → 영상 정보
  */
 @RestController
 @RequestMapping("/api/videos")
@@ -432,7 +439,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 1단계 · 01 (영상 업로드 API)
- * 영상 업로드 API 테스트. 서버를 실제로 띄우지 않고 MockMvc로 요청을 흉내 냄
+ * 영상 업로드·조회 API 테스트. 서버를 실제로 띄우지 않고 MockMvc로 요청을 흉내 냄
+ * 확인하는 것: 업로드 201, 영상 아닌 파일·빈 파일·확장자 없는 파일 400, 조회 200, 없는 영상 404
  * DB는 Docker PostgreSQL을 쓰고, 테스트가 끝나면 @Transactional로 저장한 내용을 되돌림
  */
 @SpringBootTest(properties = "app.storage.video-dir=build/test-uploads")

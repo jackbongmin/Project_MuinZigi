@@ -147,8 +147,9 @@ import java.util.Map;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 하나에 Jev로 보내는 질문 세트. 0단계 실험에서 고른 v2를 그대로 씀 (결정 002)
- * 질문 문구를 바꾸면 VERSION도 올려서, 어떤 질문으로 나온 결과인지 DB에서 구분되게 함
+ * 프레임 한 장마다 Jev에 같이 보내는 질문 4개(질문 이름 → 영어 문장)를 모아 둔 클래스
+ * 예: "person" → 사람(또는 손 같은 몸 일부)이 보이나, "putting_in_bag" → 가방·주머니에 물건을 넣고 있나
+ * 질문 문구를 바꾸면 VERSION(지금 v2)도 올려서, 어떤 질문으로 나온 결과인지 DB에서 구분되게 함
  */
 public final class FrameQuestions {
 
@@ -198,7 +199,8 @@ import jakarta.persistence.Table;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 한 장에 대한 Jev 판단 결과. 질문마다 "예"일 확률을 저장함
+ * 프레임 한 장을 Jev에 물어본 결과(질문마다 "예"일 확률)를 DB(frame_judgments 테이블)에 저장하는 엔티티
+ * 예: 11초 프레임 → person 0.98, holding_product 0.12, putting_in_bag 0.03, paying 0.01
  */
 @Entity
 @Table(name = "frame_judgments")
@@ -283,7 +285,8 @@ import com.mujinjigi.domain.analysis.entity.FrameJudgment;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * FrameJudgment 저장·조회
+ * frame_judgments 테이블에서 판단 결과를 저장·조회하는 저장소
+ * 예: findAllWithFrame(69, "v2") → 영상 69번의 v2 판단 16개를 프레임 시각 순으로 (프레임 정보까지 쿼리 한 번에)
  */
 public interface FrameJudgmentRepository extends JpaRepository<FrameJudgment, Long> {
 
@@ -311,7 +314,8 @@ import com.mujinjigi.domain.analysis.entity.FrameJudgment;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 판단 결과 응답
+ * 판단 API가 돌려주는 JSON 한 칸의 모양
+ * 예: {"frameId": 12, "timeSec": 11.0, "questionSetVersion": "v2", "model": "jev-1.14.0", "inputTokens": 2803, "answers": {"person": 0.98, ...}}
  */
 public record FrameJudgmentResponse(Long frameId, double timeSec, String questionSetVersion, String model,
                                     int inputTokens, Map<String, Double> answers) {
@@ -369,7 +373,9 @@ import com.mujinjigi.domain.video.service.FrameService;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 저장된 프레임을 Jev에 보내 판단 결과를 저장함
+ * 영상의 프레임 이미지를 하나씩 Jev에 보내 판단 결과를 frame_judgments 테이블에 저장하는 클래스
+ * 흐름: 프레임 목록 읽기 → 이미 판단한 프레임은 건너뜀 → Jev 호출 → 결과·호출 기록 저장 → 측정 로그 저장
+ * Jev가 재시도까지 실패하면 502를 돌려줌. 다시 부르면 남은 프레임부터 이어서 판단함
  */
 @Service
 public class JudgmentService {
@@ -473,7 +479,8 @@ import com.mujinjigi.domain.analysis.service.JudgmentService;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 Jev 판단 API
+ * 프레임 판단 API 요청을 받는 클래스
+ * POST /api/videos/{id}/judgments → 프레임을 Jev에 보내 판단하고 결과 목록을 돌려줌 / GET → 저장된 판단 목록
  */
 @RestController
 @RequestMapping("/api/videos/{videoId}/judgments")
@@ -540,7 +547,8 @@ import com.mujinjigi.domain.video.TestVideos;
 
 /**
  * 1단계 · 03 (Jev 프레임 판단)
- * 프레임 판단 API 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
+ * 판단 API를 실제 순서(영상 업로드 → 프레임 추출 → 판단)대로 불러 보는 테스트. 진짜 Jev 대신 가짜(JevClient mock)가 정해 둔 답을 돌려줌 (비용·네트워크 없이 실행)
+ * 확인하는 것: 판단 저장·조회, 이미 판단한 프레임 건너뛰기, Jev 실패 시 502, 추출 전 409, 없는 영상 404
  */
 @SpringBootTest(properties = {
         "app.storage.video-dir=build/test-uploads",

@@ -159,7 +159,8 @@ package com.mujinjigi.domain.payment.entity;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 기록의 종류. CSV의 type 칸에 이 이름 그대로 적힘. 취소 처리(결제 수량에서 빼기)는 3단계에서 함
+ * 결제 기록이 결제인지 취소인지 나타내는 값. CSV의 type 칸에 이 이름 그대로 적힘
+ * 예: PAY → 결제, CANCEL → 취소. 취소를 결제 수량에서 빼는 처리는 3단계에서 함
  */
 public enum PaymentType {
 
@@ -186,7 +187,8 @@ import jakarta.persistence.Table;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV 파일 하나를 올린 단위. 결제 기록 여러 줄을 묶고, 화면에 보여줄 요약(줄 수, 결제 합계)을 함께 저장함
+ * 결제 CSV 파일 하나를 올린 기록을 DB(payment_uploads 테이블)에 저장하는 엔티티. 결제 기록 여러 줄을 묶고 요약을 같이 저장함
+ * 예: sample_kiosk.csv → 4줄, 결제 합계 6,800원
  */
 @Entity
 @Table(name = "payment_uploads")
@@ -264,7 +266,9 @@ import jakarta.persistence.Table;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 키오스크 결제 CSV의 한 줄. 금액·수량은 원 단위 long으로 저장함 (double은 0.1 같은 값을 정확히 못 담아 합계에 오차가 생김)
+ * 키오스크 결제 CSV의 한 줄을 DB(payment_records 테이블)에 저장하는 엔티티
+ * 예: 2026-11-09 14:03:21, T0001, P-CHOCO 초코바 2개 × 1,500원 = 3,000원, PAY
+ * 금액·수량은 원 단위 long으로 저장함 (double은 0.1 같은 값을 정확히 못 담아 합계에 오차가 생김)
  */
 @Entity
 @Table(name = "payment_records")
@@ -374,7 +378,8 @@ import com.mujinjigi.domain.payment.entity.PaymentType;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * CSV 한 줄을 읽어 검사까지 마친 값. 엔티티(PaymentRecord)를 만들기 전 단계라 DB·업로드와 상관없음
+ * CSV 한 줄을 읽고 검사까지 마친 값. DB에 저장하기 전 단계라 아직 엔티티(PaymentRecord)가 아님
+ * 예: (2026-11-09T14:03:21, "T0001", "P-CHOCO", "초코바", 2, 1500, 3000, PAY)
  */
 public record PaymentCsvRow(
         LocalDateTime paidAt,
@@ -405,7 +410,9 @@ import com.mujinjigi.domain.payment.entity.PaymentType;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV 글자를 읽어 줄마다 PaymentCsvRow로 바꿈. 틀린 줄이 있으면 몇 번째 줄이 왜 틀렸는지 알려 주고 멈춤
+ * 결제 CSV 글자를 한 줄씩 읽고 검사해서 PaymentCsvRow 목록으로 바꾸는 클래스. 틀린 줄이 있으면 몇 번째 줄이 왜 틀렸는지 알려 주고 멈춤
+ * 예: "2026-11-09 14:03:21,T0001,P-CHOCO,초코바,2,1500,3000,PAY" → PaymentCsvRow(수량 2, 단가 1500, 금액 3000, PAY)
+ * 예: amount 칸이 quantity × unit_price와 다르면 → "2번째 줄: amount가 quantity × unit_price와 다름"
  * DB·Spring 없이 동작해서 단위 테스트로 바로 확인함
  */
 @Component
@@ -533,7 +540,8 @@ import com.mujinjigi.domain.payment.entity.PaymentUpload;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * PaymentUpload 저장·조회
+ * payment_uploads 테이블에서 업로드 기록을 저장·조회하는 저장소
+ * 예: findById(2) → 업로드 2번의 요약. save, findById 같은 기본 메서드는 JpaRepository가 만들어 줌
  */
 public interface PaymentUploadRepository extends JpaRepository<PaymentUpload, Long> {
 }
@@ -550,7 +558,8 @@ import com.mujinjigi.domain.payment.entity.PaymentRecord;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * PaymentRecord 저장·조회. 업로드 하나의 기록을 결제 시각 순으로 꺼냄 (같은 시각이면 저장 순서)
+ * payment_records 테이블에서 결제 기록을 저장·조회하는 저장소
+ * 예: findByUploadIdOrderByPaidAtAscIdAsc(2) → 업로드 2번의 기록을 결제 시각 순으로 (같은 시각이면 CSV 순서)
  */
 public interface PaymentRecordRepository extends JpaRepository<PaymentRecord, Long> {
 
@@ -570,7 +579,8 @@ import com.mujinjigi.domain.payment.entity.PaymentUpload;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV 업로드 요약 응답
+ * 결제 CSV 업로드 API가 돌려주는 요약 JSON의 모양
+ * 예: {"id": 2, "originalName": "sample_kiosk.csv", "recordCount": 4, "totalAmount": 6800, ...}
  */
 public record PaymentUploadResponse(Long id, String originalName, int recordCount, long totalAmount,
                                     LocalDateTime uploadedAt) {
@@ -596,7 +606,8 @@ import com.mujinjigi.domain.payment.entity.PaymentType;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 기록 한 줄 응답
+ * 결제 기록 API가 돌려주는 JSON 한 칸의 모양
+ * 예: {"paidAt": "2026-11-09T14:03:21", "productCode": "P-CHOCO", "productName": "초코바", "quantity": 2, "unitPrice": 1500, "amount": 3000, "type": "PAY", ...}
  */
 public record PaymentRecordResponse(Long id, LocalDateTime paidAt, String transactionId, String productCode,
                                     String productName, long quantity, long unitPrice, long amount,
@@ -644,7 +655,8 @@ import com.mujinjigi.domain.payment.repository.PaymentUploadRepository;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV를 읽어 업로드 한 건과 결제 기록 여러 줄로 저장하고, 다시 조회함
+ * 결제 CSV 파일을 받아 PaymentCsvParser로 검사하고, 업로드 한 건과 결제 기록 여러 줄로 저장하는 클래스. 저장한 것을 다시 조회도 함
+ * 흐름: 빈 파일·확장자 검사 → 줄마다 검사 → 결제 합계 계산 → 업로드·기록 저장 (틀린 줄이 하나라도 있으면 아무것도 저장 안 함)
  */
 @Service
 public class PaymentService {
@@ -743,7 +755,8 @@ import com.mujinjigi.domain.payment.service.PaymentService;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV 업로드와 조회 API
+ * 결제 CSV API 요청을 받는 클래스
+ * POST /api/payments → CSV 업로드·저장 / GET /api/payments/{id} → 업로드 요약 / GET /api/payments/{id}/records → 결제 기록 목록
  */
 @RestController
 @RequestMapping("/api/payments")
@@ -794,7 +807,8 @@ import com.mujinjigi.domain.payment.entity.PaymentType;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * PaymentCsvParser 단위 테스트. Spring·DB 없이 글자를 넣고 결과만 확인함
+ * PaymentCsvParser가 CSV를 제대로 읽고 틀린 줄을 잡아내는지 확인하는 테스트. Spring·DB 없이 글자를 넣고 결과만 확인함
+ * 예: 금액이 수량 × 단가와 다른 줄을 넣으면 → "N번째 줄: ..." 예외가 나는지
  */
 class PaymentCsvParserTest {
 
@@ -923,7 +937,8 @@ import com.mujinjigi.domain.payment.service.PaymentCsvParser;
 
 /**
  * 2단계 · 07 (결제 CSV 업로드와 저장)
- * 결제 CSV API 테스트. 실제 DB에 저장하고 테스트가 끝나면 되돌림
+ * 결제 CSV API를 실제 DB에 저장해 가며 불러 보는 테스트. 테스트가 끝나면 저장한 내용을 되돌림
+ * 확인하는 것: 업로드 요약·기록 조회, 틀린 줄 400과 줄 번호(아무것도 저장 안 됨), CSV 아닌 파일·빈 파일 400, 없는 업로드 404
  */
 @SpringBootTest
 @AutoConfigureMockMvc
